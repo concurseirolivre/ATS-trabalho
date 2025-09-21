@@ -10,16 +10,15 @@
     .hide{
         display : none;
     }
-    .car{
-        /* IMAGEM ONLINE ADICIONADA (CARRO DO JOGADOR) */
-        background: url('https://i.imgur.com/gAY1qbs.png');
-        background-repeat: no-repeat;
+    .car{background: url('enemycar4.png');
+    background-repeat: no-repeat;
         background-size:100% 100%;
-        height:80px; /* Ajuste de tamanho para a imagem */
+        height:70px;
         width: 50px;
         position: absolute;
         top:500px;
         left:100px;
+
     }
     .gamearea{margin: auto;
         width:405px;
@@ -31,13 +30,13 @@
     }
     .roadstrip{
         height: 85px;
-        width: 6px;
-        background-color: aliceblue;
-        position: absolute;
-        left: 197px;
+    width: 6px;
+    background-color: aliceblue;
+    position: absolute;
+    left: 197px;
     }
     .enemy{
-        height:80px; /* Ajuste de tamanho para a imagem */
+        height:70px;
         width: 50px;
         background-repeat: no-repeat;
         background-size:100% 100%;
@@ -48,73 +47,53 @@
         overflow: hidden;
         width:100%;
         height:97vh;
-        /* IMAGEM DE FUNDO REMOVIDA PARA SIMPLIFICAR E GARANTIR O FOCO NO JOGO */
-        background-color: #525252;
+        background: url('yellowcar.jpg');
+        background-repeat: no-repeat;
+        background-size:100% 100%;
     }
-    .startscreen{
-        font-family: cursive;
-        margin: auto;
-        height: 107px;
-        width: 202px;
-        background-color: #3c99d5;
-        color: white;
-        border-radius: 20px;
-        padding-top: 11px;
-        text-align: center;
-        font-size: 33px;
-        box-shadow: 0px 6px 10px #c35357;
-        position: relative;
-        top: 200px;
-        cursor:pointer;
+    .startscreen{        font-family: cursive;
+    margin: auto;
+    height: 107px;
+    width: 202px;
+    background-color: #3c99d5;
+    color: white;
+    border-radius: 20px;
+    padding-top: 11px;
+    text-align: center;
+    font-size: 33px;
+    box-shadow: 0px 6px 10px #c35357;
+    position: relative;
+    top: 200px;
+    cursor:pointer;
     }
     .score{
         height: 44px;
-        width: 135px;
-        background-color: blue;
-        color: white;
-        font-size: 30px;
-        padding-top: 4px;
-        padding-left: 8px;
-        position: absolute;
-        border: 2px solid white;
-        border-radius: 11px;
-        box-shadow: 0 5px 5px red
+    width: 135px;
+    background-color: blue;
+    color: white;
+    font-size: 30px;
+    padding-top: 4px;
+    padding-left: 8px;
+    position: absolute;
+    border: 2px solid white;
+    border-radius: 11px;
+    box-shadow: 0 5px 5px red
+
     }
     
-    /* --- ESTILOS DA TELA DE MENSAGEM --- */
     .message-overlay{
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.7);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 1000;
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background-color: rgba(0, 0, 0, 0.7); display: flex;
+        justify-content: center; align-items: center; z-index: 1000;
     }
     .message-box{
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        width: 80%;
-        max-width: 500px;
-        font-family: sans-serif;
+        background-color: #ffffff; padding: 30px; border-radius: 15px;
+        text-align: center; width: 80%; max-width: 500px; font-family: sans-serif;
     }
-    .message-box p {
-        font-size: 1.2em;
-        margin-bottom: 20px;
-    }
+    .message-box p { font-size: 1.2em; margin-bottom: 20px; }
     .message-box button {
-        background-color: #3c99d5;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 1em;
-        cursor: pointer;
+        background-color: #3c99d5; color: white; border: none;
+        padding: 10px 20px; border-radius: 5px; font-size: 1em; cursor: pointer;
     }
 </style>
 <body>
@@ -122,7 +101,7 @@
     <div class="startscreen ">click to start </div>
     <div class="gamearea hide"></div>
 
-    <div class="message-overlay" id="messageContainer">
+    <div class="message-overlay hide" id="messageContainer">
         <div class="message-box">
             <p id="awarenessMessage"></p>
             <button id="continueButton">Continuar</button>
@@ -131,57 +110,67 @@
 
 </body>
 <script>
+    // Seletores dos elementos originais do jogo
     let score=document.querySelector('.score');
     let startscreen=document.querySelector('.startscreen');
     let gamearea=document.querySelector('.gamearea');
 
-    const messageContainer = document.querySelector('#messageContainer');
-    const awarenessMessage = document.querySelector('#awarenessMessage');
-    const continueButton = document.querySelector('#continueButton');
-
-    const mensagens = [
-        "Beber e dirigir é crime. Se for dirigir, não beba.",
-        "O cinto de segurança salva vidas. Use-o sempre.",
-        "Respeite os limites de velocidade.",
-        "Não use o celular ao volante. A distração pode ser fatal.",
-        "Faça revisões periódicas no seu veículo."
-    ];
-
-    messageContainer.style.display = 'none';
-
-    continueButton.addEventListener('click', () => {
-        messageContainer.style.display = 'none';
-        restart();
-    });
-
-    function showAwarenessMessage() {
-        const randomIndex = Math.floor(Math.random() * mensagens.length);
-        awarenessMessage.textContent = mensagens[randomIndex];
-        messageContainer.style.display = 'flex';
-    }
-
+    // Variáveis originais do jogo
     let speed=4;
     let speed1=5;
     let score1=0;
     let music =new Audio('music.mp3');
     let crash=new Audio('crash.wav');
     let move=new Audio('move1.mp3');
+    let keys={ ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false };
+    let player={};
+    let strip={};
+
+    // --- LÓGICA DO POP-UP (AGORA SEGURA) ---
+    const messageContainer = document.querySelector('#messageContainer');
+    const awarenessMessage = document.querySelector('#awarenessMessage');
+    const continueButton = document.querySelector('#continueButton');
+    const mensagens = [
+        "Se beber, não dirija.",
+        "Use o cinto de segurança.",
+        "Respeite o limite de velocidade.",
+        "Não use o celular ao volante."
+    ];
+
+    // Esta verificação IMPEDE que o script trave se o HTML do pop-up estiver faltando
+    if (messageContainer && awarenessMessage && continueButton) {
+        messageContainer.classList.add('hide'); // Garante que comece escondido
+
+        continueButton.addEventListener('click', () => {
+            messageContainer.classList.add('hide'); // Esconde a mensagem
+            restart(); // Chama sua função original para reiniciar
+        });
+    }
+
+    function showAwarenessMessage() {
+        if (messageContainer && awarenessMessage) {
+            const randomIndex = Math.floor(Math.random() * mensagens.length);
+            awarenessMessage.textContent = mensagens[randomIndex];
+            messageContainer.classList.remove('hide'); // Mostra a tela de mensagem
+        }
+    }
+    // --- FIM DA LÓGICA DO POP-UP ---
+
+    // Event Listeners Originais
     document.addEventListener('keydown',keydown);
     document.addEventListener("keyup",keyup);
     startscreen.addEventListener('click',start);
-    let keys={
-        ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false
-    };
-    let player={};
     
+    // Funções Originais do Jogo (com pequenas correções de estabilidade)
     function start() {
         player.start=true;
-        // music.play(); // Desativado para não dar erro se o arquivo não existir
+        music.play();
+        gamearea.innerHTML = ''; // Limpa a área para um novo jogo
         gamearea.classList.remove('hide');
         startscreen.classList.add('hide');
         score.classList.remove('hide');
-		createRoadStrip()
-		createEnemies()
+		createRoadStrip();
+		createEnemies();
         window.requestAnimationFrame(gameplay);
         let car= document.createElement('div');
         car.setAttribute('class','car');
@@ -191,27 +180,26 @@
     }
 
     function gameplay() {
-        if(keys.ArrowUp && player.y>0) player.y-=5;
-        if(keys.ArrowDown && player.y< (gamearea.offsetHeight - 80)) player.y+=5; // Ajustado para altura do carro
-        if(keys.ArrowLeft && player.x>0) player.x-=5;
-        if(keys.ArrowRight && player.x< (405 - 50)) player.x+=5; // Ajustado para largura da área e carro
-        
         if(player.start) {
+            if(keys.ArrowUp && player.y>0) player.y-=5;
+            if(keys.ArrowDown && player.y< (gamearea.offsetHeight - 70)) player.y+=5;
+            if(keys.ArrowLeft && player.x>0) player.x-=5;
+            if(keys.ArrowRight && player.x < (gamearea.offsetWidth - 50)) player.x+=5;
+            
+            let car=document.querySelector('.car');
+            car.style.top=player.y + "px";
+            car.style.left=player.x + "px";
+            
+            movelines();
+            moveenemy(car);
+            score.innerHTML="score :"+ score1;
+
             window.requestAnimationFrame(gameplay);
         }
-
-        let car=document.querySelector('.car');
-        car.style.top=player.y + "px";
-        car.style.left=player.x + "px";
-        
-        movelines();
-        moveenemy(car);
-        score.innerHTML="score :"+ score1;
     }
 
 	function createRoadStrip(){
-        // Corrigido para 'let i' para maior estabilidade do código
-        for(let i=0;i<6;i++) { 
+        for(let i=0;i<6;i++) { // Corrigido para 'let i' para evitar bugs
             let roadstrip=document.createElement('div');
             roadstrip.setAttribute('class',"roadstrip");
             gamearea.appendChild(roadstrip);
@@ -221,17 +209,16 @@
 	}
 
 	function createEnemies(){
-        // Corrigido para 'let i' para maior estabilidade do código
-        for(let i=0;i<3;i++) {
+        for(let i=0;i<3;i++) { // Corrigido para 'let i' para evitar bugs
             let enemy=document.createElement('div');
+            var sinn=String(Math.ceil(Math.random()*4));
             enemy.setAttribute('class',"enemy");
             gamearea.appendChild(enemy);
             enemy.style.top=(i*180) + "px";
             enemy.y=(i*180);
             enemy.x=Math.random()*330 + 25;
             enemy.style.left=enemy.x + "px";
-            // IMAGEM ONLINE ADICIONADA (CARROS INIMIGOS)
-            enemy.style.backgroundImage=`url('https://i.imgur.com/vHq54f6.png')`;
+            enemy.style.backgroundImage=`url('enemycar${sinn}.png')`;
         }
 	}
     
@@ -249,10 +236,10 @@
         let lines=document.querySelectorAll(".enemy");
         lines.forEach(function(item)  {
             if(iscollide(car,item)) {
-                // crash.play(); // Desativado para não dar erro
-                // music.pause();
+                crash.play();
+                music.pause();
                 player.start=false;
-                showAwarenessMessage();
+                showAwarenessMessage(); // Chave da alteração: chama a função do pop-up
             }
             if(item.y>600) {
                 score1++;
@@ -267,11 +254,11 @@
  
     function keydown(e){
         keys[e.key]=true;
-        // move.play(); // Desativado para não dar erro
+        move.play();
     }
     function keyup(e){
         keys[e.key]=false;
-        // move.pause();
+        move.pause();
     }
     function iscollide(a,b) {
         let acar=a.getBoundingClientRect();
