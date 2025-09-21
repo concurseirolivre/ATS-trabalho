@@ -234,8 +234,9 @@
         // 1. Sorteia um novo tipo/cor
         let sinn = String(Math.ceil(Math.random() * 4));
         
-        // 2. Define a posição vertical no topo, fora da tela
-        enemy.y = -200; // Começa um pouco acima para entrada suave
+        // 2. Define uma posição vertical ALEATÓRIA no topo, fora da tela
+        //    Isso evita que os carros reapareçam sobrepostos.
+        enemy.y = -(Math.random() * 300 + 150); // Sorteia um valor entre -150px e -450px
         
         // 3. Define uma nova posição horizontal aleatória
         enemy.style.left = (Math.random() * 330 + 25) + "px";
