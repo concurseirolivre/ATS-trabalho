@@ -7,11 +7,9 @@
     <title>Document</title>
 </head>
 <style>
-    /* A CORREÇÃO DEFINITIVA ESTÁ AQUI */
     .hide{
         display : none !important;
     }
-
     .car{background: url('enemycar4.png');
     background-repeat: no-repeat;
         background-size:100% 100%;
@@ -55,12 +53,12 @@
     .startscreen{
         font-family: cursive;
         margin: auto;
-        height: 107px;
-        width: 202px;
+        height: auto; /* Altura automática */
+        width: 300px; /* Mais largo para caber a mensagem */
         background-color: #3c99d5;
         color: white;
         border-radius: 20px;
-        padding-top: 11px;
+        padding: 20px; /* Mais preenchimento */
         text-align: center;
         font-size: 33px;
         box-shadow: 0px 6px 10px #c35357;
@@ -68,14 +66,19 @@
         top: 200px;
         cursor:pointer;
     }
+    .startscreen small { /* Estilo para a mensagem final */
+        font-size: 16px;
+        display: block;
+        margin-top: 10px;
+    }
     .score{
         height: 44px;
-        width: 135px;
+        width: auto; /* Largura automática */
+        min-width: 135px;
+        padding: 4px 15px; /* Mais preenchimento lateral */
         background-color: blue;
         color: white;
         font-size: 30px;
-        padding-top: 4px;
-        padding-left: 8px;
         position: absolute;
         border: 2px solid white;
         border-radius: 11px;
@@ -98,7 +101,7 @@
     }
 </style>
 <body>
-    <div class="score hide">score :</div>
+    <div class="score hide">score : 0</div>
     <div class="startscreen ">click to start </div>
     <div class="gamearea hide"></div>
 
@@ -111,21 +114,25 @@
 
 </body>
 <script>
-    // Seletores dos elementos originais
+    // Seletores dos elementos
     let score=document.querySelector('.score');
     let startscreen=document.querySelector('.startscreen');
     let gamearea=document.querySelector('.gamearea');
 
-    // Variáveis originais
+    // Variáveis do jogo
     let speed=4;
     let speed1=5;
     let score1=0;
     let music =new Audio('music.mp3');
     let crash=new Audio('crash.wav');
-    let move=new Audio('move.mp3'); // Corrigido de 'move1.mp3' para o que estava no seu código original
+    let move=new Audio('move1.mp3');
     let keys={ ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false };
     let player={};
-    let strip={};
+    
+    // --- INÍCIO: NOVAS VARIÁVEIS DE LÓGICA ---
+    let hitCars = new Set(); // Usamos um Set para armazenar carros únicos que foram atingidos
+    const TOTAL_ENEMY_CARS = 4; // Total de tipos de carros inimigos
+    // --- FIM: NOVAS VARIÁVEIS DE LÓGICA ---
 
     // --- LÓGICA DO POP-UP ---
     const messageContainer = document.querySelector('#messageContainer');
@@ -136,11 +143,24 @@
         "Respeite o limite de velocidade.", "Não use o celular ao volante."
     ];
 
-    // Adiciona o evento ao botão 'Continuar'
     if (continueButton) {
         continueButton.addEventListener('click', () => {
-            messageContainer.classList.add('hide');
-            restart();
+            messageContainer.classList.add('hide'); // Esconde a mensagem
+            
+            // Verifica se o jogo acabou
+            if (hitCars.size >= TOTAL_ENEMY_CARS) {
+                restart(true); // Chama o restart com uma mensagem de vitória
+            } else {
+                // Se o jogo não acabou, reposiciona o jogador e continua
+                let car = document.querySelector('.car');
+                player.x = 100; // Posição inicial x
+                player.y = 500; // Posição inicial y
+                car.style.left = player.x + 'px';
+                car.style.top = player.y + 'px';
+                
+                player.start = true; // Libera o movimento
+                window.requestAnimationFrame(gameplay); // Continua o loop do jogo
+            }
         });
     }
 
@@ -153,12 +173,12 @@
     }
     // --- FIM DA LÓGICA DO POP-UP ---
 
-    // Event Listeners Originais
+    // Event Listeners
     document.addEventListener('keydown',keydown);
     document.addEventListener("keyup",keyup);
     startscreen.addEventListener('click',start);
     
-    // Funções Originais
+    // Funções do Jogo
     function start() {
         player.start=true;
         music.play();
@@ -172,12 +192,13 @@
         let car= document.createElement('div');
         car.setAttribute('class','car');
         gamearea.appendChild(car);
-        player.x=car.offsetLeft;
-        player.y=car.offsetTop;
+        // Posições iniciais fixas
+        player.x = 100;
+        player.y = 500;
     }
 
     function gameplay() {
-        if(player.start) {
+        if (player.start) {
             if(keys.ArrowUp && player.y>0) player.y-=5;
             if(keys.ArrowDown && player.y < (gamearea.offsetHeight - 70)) player.y+=5;
             if(keys.ArrowLeft && player.x>0) player.x-=5;
@@ -189,7 +210,9 @@
             
             movelines();
             moveenemy(car);
-            score.innerHTML="score :"+ score1;
+            
+            // Atualiza o placar para mostrar os carros atingidos
+            score.innerHTML = `Carros Atingidos: ${hitCars.size} / ${TOTAL_ENEMY_CARS}`;
 
             window.requestAnimationFrame(gameplay);
         }
@@ -208,8 +231,12 @@
 	function createEnemies(){
         for(let i=0;i<3;i++) {
             let enemy=document.createElement('div');
-            var sinn=String(Math.ceil(Math.random()*4));
+            let sinn=String(Math.ceil(Math.random()*4));
             enemy.setAttribute('class',"enemy");
+
+            // --- Armazena o tipo do carro para fácil identificação ---
+            enemy.dataset.type = sinn;
+
             gamearea.appendChild(enemy);
             enemy.style.top=(i*180) + "px";
             enemy.y=(i*180);
@@ -230,16 +257,24 @@
     }
 
     function moveenemy(car) {
-        let lines=document.querySelectorAll(".enemy");
-        lines.forEach(function(item)  {
+        let enemies=document.querySelectorAll(".enemy");
+        enemies.forEach(function(item)  {
             if(iscollide(car,item)) {
                 crash.play();
                 music.pause();
-                player.start=false;
+                player.start = false; // Pausa o jogo
+                
+                // Adiciona o tipo do carro ao nosso Set de carros atingidos
+                hitCars.add(item.dataset.type);
+                
+                // Remove o carro inimigo para não bater de novo
+                item.remove();
+                
+                // Mostra a mensagem
                 showAwarenessMessage();
             }
             if(item.y>600) {
-                score1++;
+                score1++; // Mantém o score original se quiser usar
                 item.y-=645;
                 item.style.left=(Math.random()*330 + 25) + "px";
             }
@@ -262,15 +297,26 @@
         let bcar=b.getBoundingClientRect();
         return !((acar.top>=bcar.bottom)|| (acar.left>=bcar.right) || (acar.right<=bcar.left)||(acar.bottom<=bcar.top));
     }
-    function restart() {
+
+    // A função restart agora pode mostrar uma mensagem final
+    function restart(isVictory = false) {
 		gamearea.innerHTML = '';
 		gamearea.classList.add('hide');
-		startscreen.innerHTML = 'Click to replay';
+
+        if (isVictory) {
+            startscreen.innerHTML = "Parabéns!<small>Você aprendeu sobre os perigos no trânsito. Clique para jogar de novo.</small>";
+        } else {
+            startscreen.innerHTML = 'Click to replay';
+        }
+
 		startscreen.classList.remove('hide');
 		score.classList.add('hide');
-		score1 = 0;
+		
+        // Reseta todas as variáveis para um novo jogo
+        score1 = 0;
 	    speed=4;
 	    speed1=5;
+        hitCars.clear(); // Limpa a lista de carros atingidos
     }
 </script>
 </html>
