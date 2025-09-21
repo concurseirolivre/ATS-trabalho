@@ -53,12 +53,12 @@
     .startscreen{
         font-family: cursive;
         margin: auto;
-        height: auto; /* Altura automática */
-        width: 300px; /* Mais largo para caber a mensagem */
+        height: auto;
+        width: 300px;
         background-color: #3c99d5;
         color: white;
         border-radius: 20px;
-        padding: 20px; /* Mais preenchimento */
+        padding: 20px;
         text-align: center;
         font-size: 33px;
         box-shadow: 0px 6px 10px #c35357;
@@ -66,16 +66,16 @@
         top: 200px;
         cursor:pointer;
     }
-    .startscreen small { /* Estilo para a mensagem final */
+    .startscreen small {
         font-size: 16px;
         display: block;
         margin-top: 10px;
     }
     .score{
         height: 44px;
-        width: auto; /* Largura automática */
+        width: auto;
         min-width: 135px;
-        padding: 4px 15px; /* Mais preenchimento lateral */
+        padding: 4px 15px;
         background-color: blue;
         color: white;
         font-size: 30px;
@@ -114,12 +114,10 @@
 
 </body>
 <script>
-    // Seletores dos elementos
     let score=document.querySelector('.score');
     let startscreen=document.querySelector('.startscreen');
     let gamearea=document.querySelector('.gamearea');
 
-    // Variáveis do jogo
     let speed=4;
     let speed1=5;
     let score1=0;
@@ -129,12 +127,9 @@
     let keys={ ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false };
     let player={};
     
-    // --- INÍCIO: NOVAS VARIÁVEIS DE LÓGICA ---
-    let hitCars = new Set(); // Usamos um Set para armazenar carros únicos que foram atingidos
-    const TOTAL_ENEMY_CARS = 4; // Total de tipos de carros inimigos
-    // --- FIM: NOVAS VARIÁVEIS DE LÓGICA ---
+    let hitCars = new Set();
+    const TOTAL_ENEMY_CARS = 4;
 
-    // --- LÓGICA DO POP-UP ---
     const messageContainer = document.querySelector('#messageContainer');
     const awarenessMessage = document.querySelector('#awarenessMessage');
     const continueButton = document.querySelector('#continueButton');
@@ -145,21 +140,19 @@
 
     if (continueButton) {
         continueButton.addEventListener('click', () => {
-            messageContainer.classList.add('hide'); // Esconde a mensagem
+            messageContainer.classList.add('hide');
             
-            // Verifica se o jogo acabou
             if (hitCars.size >= TOTAL_ENEMY_CARS) {
-                restart(true); // Chama o restart com uma mensagem de vitória
+                restart(true);
             } else {
-                // Se o jogo não acabou, reposiciona o jogador e continua
                 let car = document.querySelector('.car');
-                player.x = 100; // Posição inicial x
-                player.y = 500; // Posição inicial y
+                player.x = 100;
+                player.y = 500;
                 car.style.left = player.x + 'px';
                 car.style.top = player.y + 'px';
                 
-                player.start = true; // Libera o movimento
-                window.requestAnimationFrame(gameplay); // Continua o loop do jogo
+                player.start = true;
+                window.requestAnimationFrame(gameplay);
             }
         });
     }
@@ -171,14 +164,11 @@
             messageContainer.classList.remove('hide');
         }
     }
-    // --- FIM DA LÓGICA DO POP-UP ---
 
-    // Event Listeners
     document.addEventListener('keydown',keydown);
     document.addEventListener("keyup",keyup);
     startscreen.addEventListener('click',start);
     
-    // Funções do Jogo
     function start() {
         player.start=true;
         music.play();
@@ -192,7 +182,6 @@
         let car= document.createElement('div');
         car.setAttribute('class','car');
         gamearea.appendChild(car);
-        // Posições iniciais fixas
         player.x = 100;
         player.y = 500;
     }
@@ -211,7 +200,6 @@
             movelines();
             moveenemy(car);
             
-            // Atualiza o placar para mostrar os carros atingidos
             score.innerHTML = `Carros Atingidos: ${hitCars.size} / ${TOTAL_ENEMY_CARS}`;
 
             window.requestAnimationFrame(gameplay);
@@ -231,21 +219,33 @@
 	function createEnemies(){
         for(let i=0;i<3;i++) {
             let enemy=document.createElement('div');
-            let sinn=String(Math.ceil(Math.random()*4));
             enemy.setAttribute('class',"enemy");
-
-            // --- Armazena o tipo do carro para fácil identificação ---
-            enemy.dataset.type = sinn;
-
             gamearea.appendChild(enemy);
-            enemy.style.top=(i*180) + "px";
-            enemy.y=(i*180);
-            enemy.x=Math.random()*330 + 25;
-            enemy.style.left=enemy.x + "px";
-            enemy.style.backgroundImage=`url('enemycar${sinn}.png')`;
+            // Posição inicial
+            enemy.y = (i * 250) + 50; // Espaçamento vertical inicial
+            enemy.style.top = enemy.y + 'px';
+            // Agora chama a função para dar cor e posição aleatória
+            respawnEnemy(enemy);
         }
 	}
     
+    // --- INÍCIO: NOVA FUNÇÃO DE RESPAWN ---
+    function respawnEnemy(enemy) {
+        // 1. Sorteia um novo tipo/cor
+        let sinn = String(Math.ceil(Math.random() * 4));
+        
+        // 2. Define a posição vertical no topo, fora da tela
+        enemy.y = -200; // Começa um pouco acima para entrada suave
+        
+        // 3. Define uma nova posição horizontal aleatória
+        enemy.style.left = (Math.random() * 330 + 25) + "px";
+
+        // 4. Atualiza os dados do carro com o novo tipo e imagem
+        enemy.dataset.type = sinn;
+        enemy.style.backgroundImage = `url('enemycar${sinn}.png')`;
+    }
+    // --- FIM: NOVA FUNÇÃO DE RESPAWN ---
+
     function movelines() {
         let lines=document.querySelectorAll(".roadstrip");
         lines.forEach(function(item)  {
@@ -262,22 +262,21 @@
             if(iscollide(car,item)) {
                 crash.play();
                 music.pause();
-                player.start = false; // Pausa o jogo
+                player.start = false;
                 
-                // Adiciona o tipo do carro ao nosso Set de carros atingidos
                 hitCars.add(item.dataset.type);
                 
-                // Remove o carro inimigo para não bater de novo
-                item.remove();
+                // --- MUDANÇA PRINCIPAL: Recicla o carro em vez de remover ---
+                respawnEnemy(item); 
                 
-                // Mostra a mensagem
                 showAwarenessMessage();
             }
-            if(item.y>600) {
-                score1++; // Mantém o score original se quiser usar
-                item.y-=645;
-                item.style.left=(Math.random()*330 + 25) + "px";
+
+            if(item.y > 600) {
+                // --- MUDANÇA PRINCIPAL: Recicla o carro com nova cor/posição ---
+                respawnEnemy(item);
             }
+
             item.y+=speed;
             speed+=0.0002;
             item.style.top=item.y + "px";
@@ -298,7 +297,6 @@
         return !((acar.top>=bcar.bottom)|| (acar.left>=bcar.right) || (acar.right<=bcar.left)||(acar.bottom<=bcar.top));
     }
 
-    // A função restart agora pode mostrar uma mensagem final
     function restart(isVictory = false) {
 		gamearea.innerHTML = '';
 		gamearea.classList.add('hide');
@@ -312,11 +310,10 @@
 		startscreen.classList.remove('hide');
 		score.classList.add('hide');
 		
-        // Reseta todas as variáveis para um novo jogo
         score1 = 0;
 	    speed=4;
 	    speed1=5;
-        hitCars.clear(); // Limpa a lista de carros atingidos
+        hitCars.clear();
     }
 </script>
 </html>
