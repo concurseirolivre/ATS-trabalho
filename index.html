@@ -140,13 +140,16 @@
     const awarenessMessage = document.querySelector('#awarenessMessage');
     const continueButton = document.querySelector('#continueButton');
     const mensagens = [
-        "Se beber, não dirija.", "O levantamento da Associação Brasileira de Medicina do Tráfego (Abramet) aponta que 76% desses casos envolveram pedestres, ciclistas e motociclistas.
+    "Se beber, não dirija.",
+    // AQUI ESTÁ A CORREÇÃO: Usamos crase (`) no início e no fim do texto longo
+    `O levantamento da Associação Brasileira de Medicina do Tráfego (Abramet) aponta que 76% desses casos envolveram pedestres, ciclistas e motociclistas.
 
 Desde 2014, mais de 2,2 milhões de atendimentos foram realizados no Sistema Único de Saúde (SUS) para tratamento de pessoas envolvidas em sinistros graves de trânsito. E, ao longo dos anos, os casos com grupo mais exposto nas ruas cresceram:
 
-Pedestres: apesar de uma queda inicial até 2020, as internações voltaram a crescer, com pico de 39.125 em 2023.",
-        "Respeite o limite de velocidade.", "Não use o celular ao volante."
-    ];
+Pedestres: apesar de uma queda inicial até 2020, as internações voltaram a crescer, com pico de 39.125 em 2023.`,
+    "Respeite o limite de velocidade.",
+    "Não use o celular ao volante."
+];
 
     if (continueButton) {
         continueButton.addEventListener('click', () => {
