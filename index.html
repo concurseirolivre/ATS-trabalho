@@ -15,11 +15,15 @@
         background-repeat: no-repeat;
         background-size:100% 100%;
     }
+
+    /* --- INÍCIO DA CORREÇÃO --- */
     .hide{
-        display : none;
+        display: none !important; /* ADICIONADO !important para garantir que esta regra sempre tenha prioridade */
     }
+    /* --- FIM DA CORREÇÃO --- */
+
     .car{
-        background: url('enemycar4.png'); /* Sugestão: renomear para 'playercar.png' para clareza */
+        background: url('enemycar4.png');
         background-repeat: no-repeat;
         background-size:100% 100%;
         height:70px;
@@ -81,228 +85,20 @@
         border-radius: 11px;
         box-shadow: 0 5px 5px red
     }
-    /* --- INÍCIO: NOVOS ESTILOS PARA A TELA DE MENSAGEM --- */
     .message-overlay{
-        position: fixed; /* Fixo na tela, mesmo com rolagem */
+        position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         height: 100%;
-        background-color: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+        background-color: rgba(0, 0, 0, 0.7);
         display: flex;
         justify-content: center;
         align-items: center;
-        z-index: 1000; /* Garante que fique sobre todos os outros elementos */
+        z-index: 1000;
     }
     .message-box{
         background-color: #ffffff;
         padding: 30px;
         border-radius: 15px;
-        text-align: center;
-        width: 80%;
-        max-width: 500px;
-        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        font-family: Arial, sans-serif;
-    }
-    .message-box p {
-        font-size: 1.2em; /* 1.2 vezes o tamanho da fonte padrão */
-        margin-bottom: 20px;
-        color: #333;
-    }
-    .message-box button {
-        background-color: #3c99d5;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 5px;
-        font-size: 1em;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-    .message-box button:hover {
-        background-color: #2a7ab0;
-    }
-    /* --- FIM: NOVOS ESTILOS PARA A TELA DE MENSAGEM --- */
-</style>
-<body>
-    <div class="score hide">score :</div>
-    <div class="startscreen ">click to start </div>
-    <div class="gamearea hide"></div>
-
-    <div class="message-overlay hide" id="messageContainer">
-        <div class="message-box">
-            <p id="awarenessMessage">Esta é uma mensagem de exemplo.</p>
-            <button id="restartButton">Continuar</button>
-        </div>
-    </div>
-    </body>
-<script>
-    const score = document.querySelector('.score');
-    const startscreen = document.querySelector('.startscreen');
-    const gamearea = document.querySelector('.gamearea');
-
-    // --- INÍCIO: NOVOS SELETORES E VARIÁVEIS ---
-    const messageContainer = document.querySelector('#messageContainer');
-    const awarenessMessage = document.querySelector('#awarenessMessage');
-    const restartButton = document.querySelector('#restartButton');
-
-    // Array com as mensagens de conscientização. Adicione quantas quiser.
-    const mensagens = [
-        "Beber e dirigir coloca vidas em risco. Se beber, não dirija.",
-        "Use sempre o cinto de segurança. Ele pode salvar sua vida.",
-        "Respeite os limites de velocidade. A pressa pode custar caro.",
-        "Não use o celular ao dirigir. A distração pode ser fatal.",
-        "Crianças no banco de trás e na cadeirinha. Segurança em primeiro lugar."
-    ];
-    // --- FIM: NOVOS SELETORES E VARIÁVEIS ---
-
-    let speed=4;
-    let speed1=5;
-    let score1=0;
-    let music =new Audio('music.mp3');
-    let crash=new Audio('crash.wav');
-    let move=new Audio('move1.mp3');
-    let keys={ ArrowUp:false, ArrowDown:false, ArrowLeft:false, ArrowRight:false };
-    let player={};
-    let strip={};
-
-    document.addEventListener('keydown',keydown);
-    document.addEventListener("keyup",keyup);
-    startscreen.addEventListener('click',start);
-    // --- INÍCIO: NOVO EVENTO DE CLIQUE PARA O BOTÃO REINICIAR ---
-    restartButton.addEventListener('click', () => {
-        messageContainer.classList.add('hide'); // Esconde a mensagem
-        restart(); // Chama a função para reiniciar o jogo
-    });
-    // --- FIM: NOVO EVENTO DE CLIQUE PARA O BOTÃO REINICIAR ---
-
-
-    function start() {
-        player.start=true;
-        music.play();
-        gamearea.innerHTML = ''; // Limpa a área de jogo para um novo começo
-        gamearea.classList.remove('hide');
-        startscreen.classList.add('hide');
-        score.classList.remove('hide');
-        createRoadStrip();
-        createEnemies();
-        window.requestAnimationFrame(gameplay);
-        let car= document.createElement('div');
-        car.setAttribute('class','car');
-        gamearea.appendChild(car);
-        player.x=car.offsetLeft;
-        player.y=car.offsetTop;
-    }
-
-    function gameplay() {
-        if(keys.ArrowUp && player.y > 0) player.y -= 5;
-        if(keys.ArrowDown && player.y < (gamearea.offsetHeight - 70)) player.y += 5; // Ajuste para altura da área
-        if(keys.ArrowLeft && player.x > 0) player.x -= 5;
-        if(keys.ArrowRight && player.x < (gamearea.offsetWidth - 50)) player.x += 5; // Ajuste para largura da área
-
-        if(player.start) {
-            window.requestAnimationFrame(gameplay);
-            let car = document.querySelector('.car');
-            car.style.top = player.y + "px";
-            car.style.left = player.x + "px";
-            movelines();
-            moveenemy(car);
-            score.innerHTML = "score :" + score1;
-        }
-    }
-
-    function createRoadStrip(){
-        for(let i=0; i<6; i++) {
-            let roadstrip=document.createElement('div');
-            roadstrip.setAttribute('class',"roadstrip");
-            gamearea.appendChild(roadstrip);
-            roadstrip.style.top=(i*110) + "px";
-            roadstrip.y=(i*110);
-        }
-    }
-
-    function createEnemies(){
-        for(let i=0; i<3; i++) {
-            let enemy=document.createElement('div');
-            let sinn=String(Math.ceil(Math.random()*4));
-            enemy.setAttribute('class',"enemy");
-            gamearea.appendChild(enemy);
-            enemy.style.top=(i*180) + "px";
-            enemy.y=(i*180);
-            enemy.x=Math.random()*330 + 25;
-            enemy.style.left=enemy.x + "px";
-            enemy.style.backgroundImage=`url('enemycar${sinn}.png')`;
-        }
-    }
-     
-    function movelines() {
-        let lines=document.querySelectorAll(".roadstrip");
-        lines.forEach(function(item)  {
-            if(item.y > 600) item.y -= 670;
-            item.y += speed1;
-            speed1 += 0.0002;
-            item.style.top=item.y + "px";
-        });
-    }
-
-    function moveenemy(car) {
-        let enemies=document.querySelectorAll(".enemy");
-        enemies.forEach(function(item)  {
-            if(iscollide(car,item)) {
-                crash.play();
-                music.pause();
-                player.start = false; // Para a animação do jogo
-                // --- INÍCIO: MODIFICAÇÃO PRINCIPAL ---
-                // Em vez de chamar setTimeout, chamamos nossa nova função para mostrar a mensagem
-                showAwarenessMessage();
-                // --- FIM: MODIFICAÇÃO PRINCIPAL ---
-            }
-
-            if(item.y > 600) {
-                score1++;
-                item.y -= 645;
-                item.style.left=(Math.random()*330 + 25) + "px";
-            }
-            item.y += speed;
-            speed += 0.0002;
-            item.style.top = item.y + "px";
-        });
-    }
-
-    // --- INÍCIO: NOVA FUNÇÃO PARA EXIBIR A MENSAGEM ---
-    function showAwarenessMessage() {
-        // Seleciona um índice aleatório do array de mensagens
-        const randomIndex = Math.floor(Math.random() * mensagens.length);
-        // Define o texto do parágrafo com a mensagem sorteada
-        awarenessMessage.textContent = mensagens[randomIndex];
-        // Mostra o container da mensagem
-        messageContainer.classList.remove('hide');
-    }
-    // --- FIM: NOVA FUNÇÃO PARA EXIBIR A MENSAGEM ---
-
-    function keydown(e){
-        keys[e.key]=true;
-        move.play();
-    }
-    function keyup(e){
-        keys[e.key]=false;
-        move.pause();
-    }
-    function iscollide(a,b) {
-        let aRect = a.getBoundingClientRect();
-        let bRect = b.getBoundingClientRect();
-        return !((aRect.top >= bRect.bottom) || (aRect.left >= bRect.right) || (aRect.right <= bRect.left) || (aRect.bottom <= bRect.top));
-    }
-    function restart() {
-        gamearea.innerHTML = '';
-        gamearea.classList.add('hide');
-        startscreen.innerHTML = 'Clique para jogar';
-        startscreen.classList.remove('hide');
-        score.classList.add('hide');
-        score1 = 0;
-        speed = 4;
-        speed1 = 5;
-        // Não precisamos mais chamar start() daqui, o clique no botão inicial já faz isso.
-    }
-</script>
-</html>
+        text-align
