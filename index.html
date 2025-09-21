@@ -90,10 +90,16 @@
         background-color: rgba(0, 0, 0, 0.7); display: flex;
         justify-content: center; align-items: center; z-index: 1000;
     }
-    .message-box{
-        background-color: #ffffff; padding: 30px; border-radius: 15px;
-        text-align: center; width: 80%; max-width: 500px; font-family: sans-serif;
-    }
+    .message-box {
+    background-color: #ffffff;
+    padding: 40px;                 /* Mais espaçamento interno */
+    border-radius: 15px;
+    text-align: center;
+    width: 90%;                    /* Ocupa um pouco mais da tela em celulares */
+    max-width: 700px;              /* LARGURA MÁXIMA AUMENTADA */
+    font-family: sans-serif;
+    min-height: 180px;             /* (Opcional) Altura mínima garantida */
+}
     .message-box p { font-size: 1.2em; margin-bottom: 20px; }
     .message-box button {
         background-color: #3c99d5; color: white; border: none;
@@ -134,7 +140,11 @@
     const awarenessMessage = document.querySelector('#awarenessMessage');
     const continueButton = document.querySelector('#continueButton');
     const mensagens = [
-        "Se beber, não dirija.", "Use o cinto de segurança.",
+        "Se beber, não dirija.", "O levantamento da Associação Brasileira de Medicina do Tráfego (Abramet) aponta que 76% desses casos envolveram pedestres, ciclistas e motociclistas.
+
+Desde 2014, mais de 2,2 milhões de atendimentos foram realizados no Sistema Único de Saúde (SUS) para tratamento de pessoas envolvidas em sinistros graves de trânsito. E, ao longo dos anos, os casos com grupo mais exposto nas ruas cresceram:
+
+Pedestres: apesar de uma queda inicial até 2020, as internações voltaram a crescer, com pico de 39.125 em 2023.",
         "Respeite o limite de velocidade.", "Não use o celular ao volante."
     ];
 
