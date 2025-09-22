@@ -152,11 +152,10 @@
         '4': { imagem: 'aviso4.png', audio: new Audio('audio4.mp3') }
     };
 
-    if (continueButton) {
+ if (continueButton) {
         continueButton.addEventListener('click', () => {
             messageContainer.classList.add('hide');
             
-            // Verifica se o jogo acabou (se o próximo carro a aparecer seria o 5)
             if (currentCarType > TOTAL_ENEMY_CARS) {
                 restart(true);
             } else {
@@ -167,6 +166,9 @@
                 car.style.top = player.y + 'px';
                 
                 player.start = true;
+                
+                music.play(); // <-- ADICIONE ESTA LINHA AQUI
+                
                 window.requestAnimationFrame(gameplay);
             }
         });
