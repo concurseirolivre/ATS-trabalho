@@ -92,23 +92,21 @@
     }
     .message-box {
         background-color: #ffffff;
-        padding: 20px; /* Reduzido para melhor ajuste da imagem */
+        padding: 20px;
         border-radius: 15px;
         text-align: center;
         width: 90%;
         max-width: 700px;
         font-family: sans-serif;
     }
-    /* Removido min-height e p para dar prioridade à imagem */
     .message-box button {
         background-color: #3c99d5; color: white; border: none;
         padding: 10px 20px; border-radius: 5px; font-size: 1em; cursor: pointer;
     }
-    /* NOVO ESTILO PARA A IMAGEM DENTRO DO POP-UP */
     .message-box img {
         max-width: 100%;
-        max-height: 70vh; /* A imagem pode ter até 70% da altura da tela */
-        margin-bottom: 20px; /* Espaço entre a imagem e o botão */
+        max-height: 70vh;
+        margin-bottom: 20px;
     }
 </style>
 <body>
@@ -143,11 +141,10 @@
 
     // --- LÓGICA DO POP-UP ATUALIZADA ---
     const messageContainer = document.querySelector('#messageContainer');
-    const awarenessImage = document.querySelector('#awarenessImage'); // Alterado de awarenessMessage
+    const awarenessImage = document.querySelector('#awarenessImage');
     const continueButton = document.querySelector('#continueButton');
     
     // Objeto que mapeia o tipo do carro à sua imagem e áudio de aviso.
-    // Personalize com os nomes dos seus arquivos!
     const avisosPorCarro = {
         '1': {
             imagem: 'aviso1.png',
@@ -190,14 +187,10 @@
     function showAwarenessMessage(tipoCarro) {
         if (messageContainer && awarenessImage && avisosPorCarro[tipoCarro]) {
             const aviso = avisosPorCarro[tipoCarro];
-
-            // Define a imagem que deve aparecer no pop-up
             awarenessImage.src = aviso.imagem;
-            
-            // Toca o áudio específico para este aviso
-            aviso.audio.play();
-
-            // Mostra o pop-up na tela
+            if (aviso.audio) {
+                aviso.audio.play();
+            }
             messageContainer.classList.remove('hide');
         }
     }
@@ -294,7 +287,6 @@
                 
                 respawnEnemy(item); 
                 
-                // ALTERAÇÃO: Passa o tipo do carro para a função de aviso
                 let tipoDoCarro = item.dataset.type;
                 showAwarenessMessage(tipoDoCarro);
             }
@@ -305,3 +297,41 @@
 
             item.y+=speed;
             speed+=0.0002;
+            item.style.top=item.y + "px";
+        });
+    }
+ 
+    function keydown(e){
+        keys[e.key]=true;
+        move.play();
+    }
+    function keyup(e){
+        keys[e.key]=false;
+        move.pause();
+    }
+    function iscollide(a,b) {
+        let acar=a.getBoundingClientRect();
+        let bcar=b.getBoundingClientRect();
+        return !((acar.top>=bcar.bottom)|| (acar.left>=bcar.right) || (acar.right<=bcar.left)||(acar.bottom<=bcar.top));
+    }
+
+    function restart(isVictory = false) {
+		gamearea.innerHTML = '';
+		gamearea.classList.add('hide');
+
+        if (isVictory) {
+            startscreen.innerHTML = "Parabéns!<small>Você aprendeu sobre os perigos no trânsito. Clique para jogar de novo.</small>";
+        } else {
+            startscreen.innerHTML = 'Click to replay';
+        }
+
+		startscreen.classList.remove('hide');
+		score.classList.add('hide');
+		
+        score1 = 0;
+	    speed=4;
+	    speed1=5;
+        hitCars.clear();
+    }
+</script>
+</html>
