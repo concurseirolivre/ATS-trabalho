@@ -129,7 +129,6 @@
 
     let speed=3;
     let speed1=5;
-    let score1=0;
     let music =new Audio('music.mp3');
     let crash=new Audio('crash.wav');
     let move=new Audio('move1.mp3');
@@ -138,37 +137,27 @@
     
     let hitCars = new Set();
     const TOTAL_ENEMY_CARS = 4;
+    
+    // --- NOVA VARIÁVEL PARA CONTROLAR O ESTÁGIO DO JOGO ---
+    let currentCarType = 1;
 
-    // --- LÓGICA DO POP-UP ATUALIZADA ---
     const messageContainer = document.querySelector('#messageContainer');
     const awarenessImage = document.querySelector('#awarenessImage');
     const continueButton = document.querySelector('#continueButton');
     
-    // Objeto que mapeia o tipo do carro à sua imagem e áudio de aviso.
     const avisosPorCarro = {
-        '1': {
-            imagem: 'aviso1.png',
-            audio: new Audio('audio1.mp3')
-        },
-        '2': {
-            imagem: 'aviso2.png',
-            audio: new Audio('audio2.mp3')
-        },
-        '3': {
-            imagem: 'aviso3.png',
-            audio: new Audio('audio3.mp3')
-        },
-        '4': {
-            imagem: 'aviso4.png',
-            audio: new Audio('audio4.mp3')
-        }
+        '1': { imagem: 'aviso1.png', audio: new Audio('audio1.mp3') },
+        '2': { imagem: 'aviso2.png', audio: new Audio('audio2.mp3') },
+        '3': { imagem: 'aviso3.png', audio: new Audio('audio3.mp3') },
+        '4': { imagem: 'aviso4.png', audio: new Audio('audio4.mp3') }
     };
 
     if (continueButton) {
         continueButton.addEventListener('click', () => {
             messageContainer.classList.add('hide');
             
-            if (hitCars.size >= TOTAL_ENEMY_CARS) {
+            // Verifica se o jogo acabou (se o próximo carro a aparecer seria o 5)
+            if (currentCarType > TOTAL_ENEMY_CARS) {
                 restart(true);
             } else {
                 let car = document.querySelector('.car');
@@ -183,14 +172,11 @@
         });
     }
 
-    // Função de aviso atualizada para mostrar imagem e tocar áudio
     function showAwarenessMessage(tipoCarro) {
         if (messageContainer && awarenessImage && avisosPorCarro[tipoCarro]) {
             const aviso = avisosPorCarro[tipoCarro];
             awarenessImage.src = aviso.imagem;
-            if (aviso.audio) {
-                aviso.audio.play();
-            }
+            if(aviso.audio) aviso.audio.play();
             messageContainer.classList.remove('hide');
         }
     }
@@ -258,7 +244,11 @@
 	}
     
     function respawnEnemy(enemy) {
-        let sinn = String(Math.ceil(Math.random() * 4));
+        // --- ALTERAÇÃO PRINCIPAL ---
+        // Agora, o tipo do carro não é mais aleatório.
+        // Ele usa a variável global 'currentCarType' para definir qual carro deve aparecer.
+        let sinn = String(currentCarType);
+        
         enemy.y = -(Math.random() * 300 + 150);
         enemy.style.left = (Math.random() * 330 + 25) + "px";
         enemy.dataset.type = sinn;
@@ -278,16 +268,19 @@
     function moveenemy(car) {
         let enemies=document.querySelectorAll(".enemy");
         enemies.forEach(function(item) {
-            if(iscollide(car,item)) {
+            // Verifica se houve colisão E se a colisão foi com o carro do estágio atual
+            if(iscollide(car,item) && item.dataset.type == currentCarType) {
                 crash.play();
                 music.pause();
                 player.start = false;
                 
-                hitCars.add(item.dataset.type);
+                let tipoDoCarro = item.dataset.type;
+                hitCars.add(tipoDoCarro); // Adiciona ao contador de carros únicos
+                
+                currentCarType++; // AVANÇA PARA O PRÓXIMO ESTÁGIO!
                 
                 respawnEnemy(item); 
                 
-                let tipoDoCarro = item.dataset.type;
                 showAwarenessMessage(tipoDoCarro);
             }
 
@@ -328,10 +321,10 @@
 		startscreen.classList.remove('hide');
 		score.classList.add('hide');
 		
-        score1 = 0;
 	    speed=4;
 	    speed1=5;
         hitCars.clear();
+        currentCarType = 1; // --- RESET IMPORTANTE: Reinicia o estágio para o carro 1
     }
 </script>
 </html>
