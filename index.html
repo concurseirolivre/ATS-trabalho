@@ -130,6 +130,7 @@
     let speed=3;
     let speed1=5;
     let music =new Audio('music.mp3');
+    music.loop = true; // Adicionado para a música tocar continuamente
     let crash=new Audio('crash.wav');
     let move=new Audio('move1.mp3');
     let keys={ ArrowUp:false,ArrowDown:false,ArrowLeft:false,ArrowRight:false };
@@ -137,9 +138,10 @@
     
     let hitCars = new Set();
     const TOTAL_ENEMY_CARS = 4;
-    
-    // --- NOVA VARIÁVEL PARA CONTROLAR O ESTÁGIO DO JOGO ---
     let currentCarType = 1;
+
+    // --- NOVA CONSTANTE PARA A JOGABILIDADE ---
+    const MIN_VERTICAL_DISTANCE = 150; // Distância mínima (em pixels) entre os carros inimigos
 
     const messageContainer = document.querySelector('#messageContainer');
     const awarenessImage = document.querySelector('#awarenessImage');
@@ -152,7 +154,7 @@
         '4': { imagem: 'aviso4.png', audio: new Audio('audio4.mp3') }
     };
 
- if (continueButton) {
+    if (continueButton) {
         continueButton.addEventListener('click', () => {
             messageContainer.classList.add('hide');
             
@@ -166,9 +168,7 @@
                 car.style.top = player.y + 'px';
                 
                 player.start = true;
-                
-                music.play(); // <-- ADICIONE ESTA LINHA AQUI
-                
+                music.play();
                 window.requestAnimationFrame(gameplay);
             }
         });
@@ -195,7 +195,7 @@
         startscreen.classList.add('hide');
         score.classList.remove('hide');
 		createRoadStrip();
-		createEnemies();
+		createEnemies(); // Esta função agora garante um início seguro
         window.requestAnimationFrame(gameplay);
         let car= document.createElement('div');
         car.setAttribute('class','car');
@@ -234,24 +234,47 @@
         }
 	}
 
+    // --- FUNÇÃO createEnemies ATUALIZADA PARA UM INÍCIO SEGURO ---
 	function createEnemies(){
         for(let i=0;i<3;i++) {
             let enemy=document.createElement('div');
             enemy.setAttribute('class',"enemy");
             gamearea.appendChild(enemy);
-            enemy.y = (i * 250) + 50;
-            enemy.style.top = enemy.y + 'px';
-            respawnEnemy(enemy);
+
+            // Define posições iniciais fixas e seguras, bem espaçadas verticalmente
+            enemy.y = -((i * 250) + 200); // Ex: -200, -450, -700
+            
+            let sinn = String(currentCarType);
+            enemy.dataset.type = sinn;
+            enemy.style.backgroundImage = `url('enemycar${sinn}.png')`;
+            enemy.style.left = (Math.random() * 330 + 25) + "px";
+            enemy.style.top = enemy.y + "px";
         }
 	}
     
+    // --- FUNÇÃO respawnEnemy ATUALIZADA COM "DISTANCIAMENTO SOCIAL" ---
     function respawnEnemy(enemy) {
-        // --- ALTERAÇÃO PRINCIPAL ---
-        // Agora, o tipo do carro não é mais aleatório.
-        // Ele usa a variável global 'currentCarType' para definir qual carro deve aparecer.
-        let sinn = String(currentCarType);
+        let newY;
+        let isSafe;
+        const otherEnemies = Array.from(document.querySelectorAll('.enemy')).filter(e => e !== enemy);
+
+        do {
+            // Sorteia uma nova posição vertical
+            newY = -(Math.random() * 400 + 200); // Sorteia um valor entre -200px e -600px
+            isSafe = true; // Assume que a posição é segura
+
+            // Verifica contra todos os outros inimigos
+            for(let other of otherEnemies) {
+                if (Math.abs(newY - other.y) < MIN_VERTICAL_DISTANCE) {
+                    isSafe = false; // Posição é muito próxima, não é segura
+                    break; // Para de verificar e tenta sortear de novo
+                }
+            }
+        } while (!isSafe); // Repete o sorteio até encontrar uma posição segura
+
+        enemy.y = newY;
         
-        enemy.y = -(Math.random() * 300 + 150);
+        let sinn = String(currentCarType);
         enemy.style.left = (Math.random() * 330 + 25) + "px";
         enemy.dataset.type = sinn;
         enemy.style.backgroundImage = `url('enemycar${sinn}.png')`;
@@ -270,23 +293,22 @@
     function moveenemy(car) {
         let enemies=document.querySelectorAll(".enemy");
         enemies.forEach(function(item) {
-            // Verifica se houve colisão E se a colisão foi com o carro do estágio atual
             if(iscollide(car,item) && item.dataset.type == currentCarType) {
                 crash.play();
                 music.pause();
                 player.start = false;
                 
                 let tipoDoCarro = item.dataset.type;
-                hitCars.add(tipoDoCarro); // Adiciona ao contador de carros únicos
+                hitCars.add(tipoDoCarro);
                 
-                currentCarType++; // AVANÇA PARA O PRÓXIMO ESTÁGIO!
+                currentCarType++;
                 
                 respawnEnemy(item); 
                 
                 showAwarenessMessage(tipoDoCarro);
             }
 
-            if(item.y > 600) {
+            if(item.y > gamearea.offsetHeight) {
                 respawnEnemy(item);
             }
 
@@ -298,7 +320,7 @@
  
     function keydown(e){
         keys[e.key]=true;
-        move.play();
+        if(player.start) move.play();
     }
     function keyup(e){
         keys[e.key]=false;
@@ -326,7 +348,7 @@
 	    speed=4;
 	    speed1=5;
         hitCars.clear();
-        currentCarType = 1; // --- RESET IMPORTANTE: Reinicia o estágio para o carro 1
+        currentCarType = 1;
     }
 </script>
 </html>
